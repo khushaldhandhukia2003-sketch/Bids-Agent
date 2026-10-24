@@ -1,0 +1,56 @@
+trigger:
+- master
+- test
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+# ── Frontend ──────────────────────────────────────────────────
+- task: UseNode@1
+  inputs:
+    version: '20.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm ci
+    npm run build
+  displayName: 'Build React frontend'
+
+# ── Backend ───────────────────────────────────────────────────
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+  displayName: 'Install Python 3.11'
+
+- script: |
+    cd deal-tracking-backend
+    pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+  displayName: 'Install Python dependencies into package folder'
+
+# ── Zip backend with packages ─────────────────────────────────
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'deal-tracking-backend'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/backend.zip'
+  displayName: 'Zip backend with packages'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+  displayName: 'Publish artifact'
+
+# ── Deploy to Azure App Service ───────────────────────────────
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'BidsAgent-sc'
+    appType: 'webAppLinux'
+    appName: 'BidsAgent'
+    package: '$(Build.ArtifactStagingDirectory)/backend.zip'
+    runtimeStack: 'PYTHON|3.11'
+    startUpCommand: 'bash startup.sh'
+  displayName: 'Deploy to Azure App Service'

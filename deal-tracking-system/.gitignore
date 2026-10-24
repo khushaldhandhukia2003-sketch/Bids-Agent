@@ -1,0 +1,34 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+__pycache__/
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+deal-tracking-backend\__pycache__
+deal-tracking-backend\uploads
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.env
+
+77034cd2-2e44-41a9-8fd3-2eb1bbedb4ff-app.zip
+
+
+deal-tracking-backend/services/__pycache__
+deal-tracking-backend/routes/__pycache__
